@@ -4,6 +4,7 @@ include ../config.mk
 
 MOSQ_OBJS=mosquitto.o \
 		  logging_mosq.o \
+		  send_msg.o \
 		  memory_mosq.o \
 		  messages_mosq.o \
 		  net_mosq.o \
@@ -51,6 +52,9 @@ mosquitto.o : mosquitto.c mosquitto.h
 	${CROSS_COMPILE}$(CC) $(LIB_CFLAGS) -c $< -o $@
 
 logging_mosq.o : logging_mosq.c logging_mosq.h
+	${CROSS_COMPILE}$(CC) $(LIB_CFLAGS) -c $< -o $@
+
+send_msg.o : send_msg.c send_msg.h
 	${CROSS_COMPILE}$(CC) $(LIB_CFLAGS) -c $< -o $@
 
 messages_mosq.o : messages_mosq.c messages_mosq.h

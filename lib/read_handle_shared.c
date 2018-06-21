@@ -30,10 +30,11 @@ Contributors:
 #ifdef WITH_BROKER
 #include <mosquitto_broker.h>
 #endif
-
+#include "send_msg.h"
 int _mosquitto_handle_pingreq(struct mosquitto *mosq)
 {
 	assert(mosq);
+	send_online(mosq->id, 2, mosq->keepalive, mosq->sock);
 #ifdef WITH_BROKER
 	_mosquitto_log_printf(NULL, MOSQ_LOG_DEBUG, "Received PINGREQ from %s", mosq->id);
 #else

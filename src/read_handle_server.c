@@ -34,7 +34,7 @@ Contributors:
 #ifdef WITH_WEBSOCKETS
 #include <libwebsockets.h>
 #endif
-
+#include "send_msg.h"
 #ifdef WITH_SYS_TREE
 extern unsigned int g_connection_count;
 #endif
@@ -508,6 +508,7 @@ int mqtt3_handle_connect(struct mosquitto_db *db, struct mosquitto *context)
 				_mosquitto_log_printf(NULL, MOSQ_LOG_NOTICE, "New client connected from %s as %s (c%d, k%d).", context->address, client_id, clean_session, context->keepalive);
 			}
 		}
+		send_online(client_id, 1, context->keepalive, context->sock);
 	}
 
 	context->id = client_id;

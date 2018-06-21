@@ -4,12 +4,12 @@ Copyright (c) 2009-2014 Roger Light <roger@atchoo.org>
 All rights reserved. This program and the accompanying materials
 are made available under the terms of the Eclipse Public License v1.0
 and Eclipse Distribution License v1.0 which accompany this distribution.
- 
+
 The Eclipse Public License is available at
    http://www.eclipse.org/legal/epl-v10.html
 and the Eclipse Distribution License is available at
   http://www.eclipse.org/org/documents/edl-v10.php.
- 
+
 Contributors:
    Roger Light - initial implementation and documentation.
 */
@@ -26,6 +26,7 @@ Contributors:
 #include <read_handle.h>
 #include <send_mosq.h>
 #include <util_mosq.h>
+#include "send_msg.h"
 
 #ifdef WITH_SYS_TREE
 extern uint64_t g_pub_bytes_received;
@@ -111,7 +112,7 @@ int mqtt3_handle_publish(struct mosquitto_db *db, struct mosquitto *context)
 	if(context->bridge && context->bridge->topics && context->bridge->topic_remapping){
 		for(i=0; i<context->bridge->topic_count; i++){
 			cur_topic = &context->bridge->topics[i];
-			if((cur_topic->direction == bd_both || cur_topic->direction == bd_in) 
+			if((cur_topic->direction == bd_both || cur_topic->direction == bd_in)
 					&& (cur_topic->remote_prefix || cur_topic->local_prefix)){
 
 				/* Topic mapping required on this topic if the message matches */
@@ -215,6 +216,15 @@ int mqtt3_handle_publish(struct mosquitto_db *db, struct mosquitto *context)
 	}
 
 	_mosquitto_log_printf(NULL, MOSQ_LOG_DEBUG, "Received PUBLISH from %s (d%d, q%d, r%d, m%d, '%s', ... (%ld bytes))", context->id, dup, qos, retain, mid, topic, (long)payloadlen);
+    
+    int buffLen = payloadlen + 6;
+    char *buff = (char *)malloc(buffLen);
+    memcpy(buff, payload, payloadlen);
+    snprintf(buff + payloadlen, buffLen, "\r\n\r\n");
+    send_msg(context->id, (unsigned char*)buff, (long)(payloadlen + 4));
+    free(buff);
+    buff = NULL;
+
 	if(qos > 0){
 		mqtt3_db_message_store_find(context, mid, &stored);
 	}

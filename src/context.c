@@ -24,7 +24,7 @@ Contributors:
 #include <time_mosq.h>
 
 #include "uthash.h"
-
+#include "send_msg.h"
 struct mosquitto *mqtt3_context_init(struct mosquitto_db *db, mosq_sock_t sock)
 {
 	struct mosquitto *context;
@@ -187,6 +187,7 @@ void mqtt3_context_cleanup(struct mosquitto_db *db, struct mosquitto *context, b
 
 void mqtt3_context_disconnect(struct mosquitto_db *db, struct mosquitto *ctxt)
 {
+	send_online(ctxt->id, 0, ctxt->keepalive, ctxt->sock);
 	if(ctxt->state != mosq_cs_disconnecting && ctxt->will){
 		if(mosquitto_acl_check(db, ctxt, ctxt->will->topic, MOSQ_ACL_WRITE) == MOSQ_ERR_SUCCESS){
 			/* Unexpected disconnect, queue the client will. */
